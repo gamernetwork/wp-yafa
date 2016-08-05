@@ -1,8 +1,13 @@
+# WP-Yafa
 
-# YAFA Wordpress client plugin
+A Wordpress client plugin for the YAFA ad server:
 
+https://github.com:gamernetwork/yafa
 
-Drop this folder into plugins and activate it.
+## Installation
+
+```
+```
 
 The YAFA Admin is in the wordpress settings where you can modify the options and pull in the first ads for your site.
 

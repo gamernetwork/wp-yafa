@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package YAFA Plugin Admin
+ * @package YAFA Client Plugin
  * @version 1.0
  * Created by Gamer Network.
  * Developer: @lukeinage
