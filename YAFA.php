@@ -111,50 +111,52 @@ class YAFA
 
         $email = "";
 
-        foreach($zones as $zone => $ad)
+        foreach($zones as $zone => $ads)
         {
-            if(array_key_exists($ad->obfuscated_name, $sorted_ad_list))
-            {
-                $cached_ad = $sorted_ad_list[$ad->obfuscated_name];
-                unset($sorted_ad_list[$ad->obfuscated_name]);
-                if($cached_ad->zone == $zone && $cached_ad->image == $ad->image && $cached_ad->click == $ad->click)
-                {
-                    $email .= "\nSkipped Update: ".$ad->image;
-                    continue;
-                }
-                else
-                {
-                    $wpdb->update(
-                        $table_name,
-                        array(
-                            'time' => current_time('mysql', 1),
-                            'zone' => $zone,
-                            'image' => $ad->image,
-                            'click' => $ad->click
-                        ),
-                        array('obfuscated_name' => $ad->obfuscated_name)
-                    );
-                    $email .= "\nUpdated: ".$ad->image;
-                }
-            }
-            else
-            {
-                $wpdb->insert(
-                    $table_name,
-                    array(
-                        'time' => current_time('mysql', 1),
-                        'zone' => $zone,
-                        'obfuscated_name' => $ad->obfuscated_name,
-                        'image' => $ad->image,
-                        'click' => $ad->click
-                    )
-                );
-                $email .= "\nInserted: ".$ad->image;
-            }
-            if ($wpdb->last_error)
-            {
-                throw new Exception("WPDB Error: ".$wpdb->last_error);
-            }
+			foreach($ads as $ad) {
+				if(array_key_exists($ad->obfuscated_name, $sorted_ad_list))
+				{
+					$cached_ad = $sorted_ad_list[$ad->obfuscated_name];
+					unset($sorted_ad_list[$ad->obfuscated_name]);
+					if($cached_ad->zone == $zone && $cached_ad->image == $ad->image && $cached_ad->click == $ad->click)
+					{
+						$email .= "\nSkipped Update: ".$ad->image;
+						continue;
+					}
+					else
+					{
+						$wpdb->update(
+							$table_name,
+							array(
+								'time' => current_time('mysql', 1),
+								'zone' => $zone,
+								'image' => $ad->image,
+								'click' => $ad->click
+							),
+							array('obfuscated_name' => $ad->obfuscated_name)
+						);
+						$email .= "\nUpdated: ".$ad->image;
+					}
+				}
+				else
+				{
+					$wpdb->insert(
+						$table_name,
+						array(
+							'time' => current_time('mysql', 1),
+							'zone' => $zone,
+							'obfuscated_name' => $ad->obfuscated_name,
+							'image' => $ad->image,
+							'click' => $ad->click
+						)
+					);
+					$email .= "\nInserted: ".$ad->image;
+				}
+				if ($wpdb->last_error)
+				{
+					throw new Exception("WPDB Error: ".$wpdb->last_error);
+				}
+			}
         }
 
         foreach($sorted_ad_list as $ad)
@@ -171,7 +173,7 @@ class YAFA
      * @return string
      * This method should be called by the template, gets a random ad from a zone
      */
-    public function get_ad($zone)
+    public function get_ad_attr($zone)
     {
         if($this->queried_ads == false) {
             $this->filter_ads();
@@ -185,7 +187,7 @@ class YAFA
                 $key = rand(0, $amount-1);
                 $ad_selected = $this->ad_pool[$zone][$key];
                 array_splice($this->ad_pool[$zone], $key, 1);
-                return '<div class="'.$ad_selected->obfuscated_name.'" data-yafa-img="'.$ad_selected->image.'" data-yafa-click="'.$ad_selected->click.'"></div>';
+                return ' data-yafa-name="'.$ad_selected->obfuscated_name.'" data-yafa-img="'.$ad_selected->image.'" data-yafa-click="'.$ad_selected->click.'" ';
             }
         }
 
@@ -275,9 +277,34 @@ function yafa_admin()
     }
 }
 
+function yafa_footer_script() {
+	?>
+		<script>
+        function yafaIt() {
+            var yafaList = document.querySelectorAll('[data-yafa-click]');
+            for(var i = 0;i < yafaList.length;i++)
+            {
+                var yafa = yafaList[i];
+                var yafa_click = yafa.getAttribute("data-yafa-click");
+                var yafa_img = yafa.getAttribute("data-yafa-img");
+                var yafa_target = yafa.getAttribute("data-yafa-target");
+                var yafa_style = yafa.getAttribute("data-yafa-style");
+                var tgt = jQuery(yafa_target);
+                tgt.attr(
+                    'style', 'background-image: url(' + yafa_img + ');' + yafa_style
+                );
+                jQuery(yafa).hide();
+            }
+        }
+		</script>
+	<?php
+}
+
 // Plugin Hooks
 add_action('init', 'yafa_admin');
 add_filter('cron_schedules', 'add_minute_cron');
 add_action('yafa_cron_schedule', 'yafa_cron');
+add_action( 'wp_footer', 'yafa_footer_script' );
+
 register_activation_hook(__FILE__, 'yafa_activated');
 register_deactivation_hook(__FILE__, 'yafa_deactivated');
