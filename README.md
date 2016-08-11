@@ -7,46 +7,52 @@ https://github.com:gamernetwork/yafa
 ## Installation
 
 ```
+wp plugin install https://github.com/gamernetwork/wp-yafa/archive/master.zip
+wp plugin activate wp-yafa-master
 ```
 
-The YAFA Admin is in the wordpress settings where you can modify the options and pull in the first ads for your site.
+Set your YAFA server endpoint and site code in the 'YAFA Admin' panel in Wordpress settings.
 
-Drop ads into the same containers as DFP ads and call the get_ad(); method for your ad zone.
+### Enable YAFA units in Wordpress theme
 
-```
-<div>
-  <?php if(function_exists("get_yafa")){echo get_yafa()->get_ad("300x250");} ?>
-  <div class="advert-container" data-dfp-id="VRFocus_Desktop_Homepage_MPU" data-dfp-sizes="300x250"></div>
-</div>
-```
-
-To activate the ads during adblock put a try/catch statement around our normal DFP ads library and insert the dfp ad remove/YAFA setup code. This code may just be added to the plugin in the future using another method to detect adblock.
+Assuming standard GN style DFP container units:
 
 ```
+<div
+  class="advert skin" data-dfp-id="site-skin" data-dfp-sizes="1920x900"
+  <?php
+    if(function_exists("get_yafa")){
+      echo get_yafa()->get_ad_attr("skin");
+      ?> 
+        data-yafa-target="#page-wrapper"
+        data-yafa-style="padding-top:200px; background-color: white; background-repeat: no-repeat; background-position: 50% 0;"
+        data-yafa-linktarget="#page-wrapper, #inner-wrapper, .page"
+        data-yafa-linkheight="1200"
+      <?php
+    }
+  ?>
+></div>
+```
+
+### Render ads
+
+Assuming you already have adblock detection of some sort, call `yafaIt()` when detected. e.g.
+
+```
+<script>
 try
 {
-    $('.advert-container').getDFPads({
-    ...
-    });
-catch(e)
-{
-    var dfp = document.querySelectorAll('[data-dfp-id]');
-    for(var i = 0;i < dfp.length;i++)
-    {
-        dfp[i].parentNode.removeChild(dfp[i]);
+  $('.advert').getDFPads({
+  ...
+  });
+catch(e) {
+  <?php
+    if( function_exists( "get_yafa" ) ) {
+    ?>
+      yafaIt();
+    <?php
     }
-    var yafaList = document.querySelectorAll('[data-yafa-click]');
-    for(var i = 0;i < yafaList.length;i++)
-    {
-        var yafa = yafaList[i];
-        var link = document.createElement('a');
-        link.setAttribute("href", yafa.getAttribute("data-yafa-click"));
-        link.setAttribute("target", "_blank");
-        var img = document.createElement('img');
-        img.setAttribute("src", yafa.getAttribute("data-yafa-img"));
-        link.appendChild(img);
-        yafa.appendChild(link);
-    }
+ ?>
 }
 ```
 
