@@ -281,19 +281,39 @@ function yafa_footer_script() {
 	?>
 		<script>
         function yafaIt() {
-            var yafaList = document.querySelectorAll('[data-yafa-click]');
-            for(var i = 0;i < yafaList.length;i++)
+            var ads = document.querySelectorAll('[data-dfp-id]');
+            for(var i = 0;i < ads.length;i++)
             {
-                var yafa = yafaList[i];
-                var yafa_click = yafa.getAttribute("data-yafa-click");
-                var yafa_img = yafa.getAttribute("data-yafa-img");
-                var yafa_target = yafa.getAttribute("data-yafa-target");
-                var yafa_style = yafa.getAttribute("data-yafa-style");
-                var tgt = jQuery(yafa_target);
-                tgt.attr(
-                    'style', 'background-image: url(' + yafa_img + ');' + yafa_style
-                );
-                jQuery(yafa).hide();
+				var ad = ads[i];
+				if( ad.hasAttribute("data-yafa-img") ) {
+					var yafa_click = ad.getAttribute("data-yafa-click");
+					var yafa_img = ad.getAttribute("data-yafa-img");
+					var yafa_target = ad.getAttribute("data-yafa-target");
+					var yafa_style = ad.getAttribute("data-yafa-style");
+					var yafa_linktarget = ad.getAttribute("data-yafa-linktarget");
+					var yafa_linkheight = 0;
+					if( ad.hasAttribute("data-yafa-linkheight") ) {
+						yafa_linkheight = ad.getAttribute("data-yafa-linkheight");
+					}
+					var tgt = jQuery(yafa_target);
+					tgt.attr(
+						'style', 'background-image: url(' + yafa_img + ');' + yafa_style
+					);
+					jQuery('html').bind('mousemove', function(e) {
+						console.log(jQuery('#page-wrapper, #inner-wrapper, .page').is(e.target));
+						if( (jQuery('#page-wrapper, #inner-wrapper, .page').is(e.target)) && (yafa_linkheight == 0 || e.pageY <=yafa_linkheight ) ) {
+							jQuery('html').css({ 'cursor' :'pointer' });
+						} else {
+							jQuery('html').css({ 'cursor' :'auto' });
+						}
+					});
+					jQuery('html').bind('click', function (e) { 
+						if( (jQuery('#page-wrapper, #inner-wrapper, .page').is(e.target)) && (yafa_linkheight == 0 || e.pageY <=yafa_linkheight ) ) {
+							window.open(yafa_click,'_blank');
+						}
+					});
+				}
+                jQuery(ad).hide();
             }
         }
 		</script>
