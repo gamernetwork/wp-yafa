@@ -34,6 +34,8 @@ Assuming standard GN style DFP container units:
 ></div>
 ```
 
+In this example, the `data-yafa-target` value of `#page-wrapper` is an existing page element onto which the ad image will be applied as a background. To achieve correct alignment, some additional styles are defined in `data-yafa-style`.  A set of elements which should be clickable are defined in `data-yafa-linktarget` and there is an optional height limit defined in `data-yafa-linkheight`, for cases where the clickable elements have no height limit but the ad image does.
+
 ### Render ads
 
 Assuming you already have adblock detection of some sort, call `yafaIt()` when detected. e.g.
