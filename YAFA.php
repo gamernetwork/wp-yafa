@@ -300,7 +300,6 @@ function yafa_footer_script() {
 						'style', 'background-image: url(' + yafa_img + ');' + yafa_style
 					);
 					jQuery('html').bind('mousemove', function(e) {
-						console.log(jQuery('#page-wrapper, #inner-wrapper, .page').is(e.target));
 						if( (jQuery('#page-wrapper, #inner-wrapper, .page').is(e.target)) && (yafa_linkheight == 0 || e.pageY <=yafa_linkheight ) ) {
 							jQuery('html').css({ 'cursor' :'pointer' });
 						} else {
