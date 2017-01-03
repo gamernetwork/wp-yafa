@@ -308,7 +308,7 @@ function yafa_footer_script() {
 					});
 					jQuery('html').bind('click', function (e) { 
 						if( (jQuery('#page-wrapper, #inner-wrapper, .page').is(e.target)) && (yafa_linkheight == 0 || e.pageY <=yafa_linkheight ) ) {
-							window.open(yafa_click,'_blank');
+							window.open(yafa_click,'_top');
 						}
 					});
 				}
